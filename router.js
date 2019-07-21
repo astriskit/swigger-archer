@@ -2,7 +2,7 @@ let router = require("express").Router();
 let { permissioned } = require("./helpers");
 
 router.get("/", (req, res) => {
-  return res.render("index", { echo: "login" });
+  return res.render("index", { user: { token: "" } });
 });
 router.get("/calendars", permissioned(), (req, res) => {
   // GET calendars
