@@ -1,7 +1,15 @@
 if user && user.token
-    div 
-        h1 Welcome #{user.name}!
-        a(href="logout") Log-out
+    case content_key
+        when "events"
+            include ./events.pug
+        when "event"
+            include ./event.pug
+        default
+            div
+                h1 Welcome #{user.name}!
+            div.top-nav
+                a(href="logout") Log-out
+                a(href="get-events") See events
 else
     div 
         h1 You are signed-out. 

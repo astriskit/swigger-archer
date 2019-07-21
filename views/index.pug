@@ -6,6 +6,10 @@ html
             include ./index.css
     body
         div.main-content
-            include ./user.pug
+            case content_key
+                when "error"
+                    include ./error.pug
+                default
+                    include ./user.pug
         div.footer
             include ./footer.pug

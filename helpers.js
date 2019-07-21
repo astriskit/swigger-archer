@@ -58,6 +58,12 @@ const login = async (req, res) => {
       });
       // Save the user's name in a cookie
       res.cookie("graph_user_name", user.name, { maxAge: 3600000 });
+      res.clearCookie("graph_refresh_token", token.token.refresh_token, {
+        maxAge: 720000
+      });
+      res.clearCookie("graph_token_expires", token.token.expires_at.getTime(), {
+        maxAge: 360000
+      });
       return res.redirect("/");
     } catch (err) {
       return res.redirect("/");

@@ -1,0 +1,11 @@
+div.top-nav
+    a(href="/") Home
+    a(href="create-event-page") Create event
+    a(href="/logout") Logout
+div
+    h2 List of events in the upcoming week
+    ol.events-list
+        each event in events
+            li Subject: #{event.subject} from #{event.start.dateTime} #{event.start.timeZone} to #{event.end.dateTime} #{event.end.timeZone}
+        else
+            li No events
