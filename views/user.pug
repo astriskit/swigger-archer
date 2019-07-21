@@ -1,0 +1,8 @@
+if user && user.token
+    div 
+        h1 Welcome #{user.name}!
+        a(href="logout") Log-out
+else
+    div 
+        h1 You are signed-out. 
+        a(href="login") Click to login

@@ -1,8 +1,11 @@
 let router = require("express").Router();
-let { permissioned } = require("./helpers");
+let { permissioned, login } = require("./helpers");
 
-router.get("/", (req, res) => {
-  return res.render("index", { user: { token: "" } });
+router.get("/login", login);
+router.get("/logout", permissioned(), (req, res) => {
+  res.clearCookie("graph_access_token");
+  res.clearCookie("graph_access_user");
+  return res.redirect("/");
 });
 router.get("/calendars", permissioned(), (req, res) => {
   // GET calendars
@@ -44,12 +47,16 @@ router.post("/calendar/:calendar_id/event", permissioned(), (req, res) => {
     echo: `create /event in /calendar/${req.params.event_id}`
   });
 });
-router.post("/login", (req, res) => {
-  // logs some one in to the microsoft account
-  return res.json({ token: "something" });
-});
-router.post("/logout", (req, res) => {
-  // clears the session of the user
-  return res.json({ token: "clearing out.." });
+router.all("/", (req, res) => {
+  if (req.cookies && req.cookies.graph_access_token) {
+    return res.render("index", {
+      user: {
+        token: req.cookies.graph_access_token,
+        name: req.cookies.graph_user_name
+      }
+    });
+  } else {
+    return res.render("index", { user: null });
+  }
 });
 module.exports = router;
