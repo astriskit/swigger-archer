@@ -1,5 +1,5 @@
 const config = {
-  port: 3000,
+  port: { http: 3000, https: 3443 },
   views: "views"
 };
 
