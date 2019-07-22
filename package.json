@@ -1,5 +1,5 @@
 {
-  "name": "swigger-archer-backend",
+  "name": "swigger-archer",
   "version": "1.0.0",
   "description": "a web app for managing one's outlook.com events",
   "main": "app.js",
