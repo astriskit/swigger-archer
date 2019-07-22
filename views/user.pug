@@ -6,11 +6,11 @@ if user && user.token
             include ./event.pug
         default
             div
-                h1 Welcome #{user.name}!
+                h2 Welcome #{user.name}!
             div.top-nav
                 a(href="logout") Log-out
                 a(href="get-events") See events
 else
     div 
-        h1 You are signed-out. 
+        h2 You are signed-out. 
         a(href="login") Click to login
