@@ -1,14 +1,18 @@
 {
   "name": "swigger-archer-backend",
   "version": "1.0.0",
-  "description": "backend microservice to CRUD outlook events",
-  "main": "index.js",
+  "description": "a web app for managing one's outlook.com events",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/astriskit/swigger-archer.git"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@microsoft/microsoft-graph-client": "^1.7.0",
     "body-parser": "^1.19.0",
