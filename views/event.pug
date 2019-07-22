@@ -2,20 +2,40 @@ div.top-nav
     a(href="/") Home
     a(href="/get-events") Events
     a(href="/logout") Logout
-form.create-event(action="create-event", method="get")
-    div
-        label(for="subject") Subject
-        input(type="text", name="subject", required="required")
-    div
-        label(for="content") Content
-        input(type="text", name="content", required="required")
-    div
-        label(for="where") Where
-        input(type="text", name="where", required="required")
-    div
-        label(for="from") From
-        input(type="datetime-local", name="from", required="required")
-    div
-        label(for="to") To
-        input(type="datetime-local", name="to", required="required")
-    input(type="submit", value="Create event")
+if event
+    form.create-event(action="/update-event", method="get")
+        div
+            label(for="subject") Subject
+            input(type="text", name="subject", required="required", value=event.subject)
+        div
+            label(for="content") Content
+            input(type="text", name="content", required="required", value=event.body)
+        div
+            label(for="where") Where
+            input(type="text", name="where", required="required" value=event.where)
+        div
+            label(for="") From
+            input(type="datetime-local", name="from", required="required", value=event.start)
+        div
+            label(for="to") To
+            input(type="datetime-local", name="to", required="required", value=event.end)
+            input(type="hidden", name="id", value=event.id)
+        input(type="submit", value="Update event")
+else
+    form.create-event(action="create-event", method="get")
+        div
+            label(for="subject") Subject
+            input(type="text", name="subject", required="required")
+        div
+            label(for="content") Content
+            input(type="text", name="content", required="required")
+        div
+            label(for="where") Where
+            input(type="text", name="where", required="required")
+        div
+            label(for="from") From
+            input(type="datetime-local", name="from", required="required")
+        div
+            label(for="to") To
+            input(type="datetime-local", name="to", required="required")
+        input(type="submit", value="Create event")

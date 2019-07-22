@@ -2,10 +2,13 @@ div.top-nav
     a(href="/") Home
     a(href="create-event-page") Create event
     a(href="/logout") Logout
-div
+div.events-list-container
     h2 List of events in the upcoming week
     ol.events-list
         each event in events
-            li Subject: #{event.subject} from #{event.start.dateTime} #{event.start.timeZone} to #{event.end.dateTime} #{event.end.timeZone}
+            li 
+                p Subject: #{event.subject} from #{event.start.dateTime} #{event.start.timeZone} to #{event.end.dateTime} #{event.end.timeZone}
+                a(href='/update-event-page/'+event.id) Update
+                a.danger(href='/delete-event/'+event.id) Delete
         else
-            li No events
+            li No events for this weekend
