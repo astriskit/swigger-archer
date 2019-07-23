@@ -205,7 +205,7 @@ router.get("/create-event-page", permissioned(), (req, res) => {
 router.all("/", (req, res) => {
   if (req.cookies && req.cookies.uid) {
     let user = getUser(req.cookies.uid);
-    if (user.graph_access_token) {
+    if (user && user.graph_access_token) {
       return res.render("index", {
         user: {
           token: user.graph_access_token,
