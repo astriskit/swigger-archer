@@ -98,12 +98,21 @@ router.get("/create-event", permissioned(), async (req, res) => {
     return res.redirect("/get-events");
   }
 });
-router.get("/update-event", async (req, res)=>{
+router.get("/update-event", async (req, res) => {
   const accessToken = req.cookies.graph_access_token;
   const userName = req.cookies.graph_user_name;
-  const { subject, content, from, to, where, id} = req.query;
+  const { subject, content, from, to, where, id } = req.query;
   let parms = {};
-  if (accessToken && userName && subject && content && from && to && where && id) {
+  if (
+    accessToken &&
+    userName &&
+    subject &&
+    content &&
+    from &&
+    to &&
+    where &&
+    id
+  ) {
     parms.user = userName;
 
     // Initialize Graph client
@@ -132,19 +141,19 @@ router.get("/update-event", async (req, res)=>{
     };
     try {
       await client.api(`/me/events/${id}`).patch(event);
-      return res.redirect(200,"/get-events");
+      return res.redirect(200, "/get-events");
     } catch (err) {
-      console.log(err, 'error')
+      console.log(err, "error");
       return res.render("index", { ...err, content_key: "error" });
     }
   } else {
-    return res.redirect(400,`/update-event-page/${id}`);
+    return res.redirect(400, `/update-event-page/${id}`);
   }
-})
-router.get("/update-event-page/:id", async (req, res)=>{
+});
+router.get("/update-event-page/:id", async (req, res) => {
   const accessToken = req.cookies.graph_access_token;
   const userName = req.cookies.graph_user_name;
-  const {id} = req.params;
+  const { id } = req.params;
   let parms = {};
   if (accessToken && id) {
     parms.user = userName;
@@ -157,34 +166,36 @@ router.get("/update-event-page/:id", async (req, res)=>{
     });
     try {
       let event = await client.api(`/me/events/${id}`).get();
-      return res.render('index', {user:{token:accessToken}, 
-                                  event:{
-                                    subject:event.subject, 
-                                    id:event.id,
-                                    body:event.bodyPreview,
-                                    start:event.start.dateTime.substring(0, 23),
-                                    end:event.end.dateTime.substring(0, 23),
-                                    where: event.location.displayName
-                                  }, content_key:'event'})
+      return res.render("index", {
+        user: { token: accessToken },
+        event: {
+          subject: event.subject,
+          id: event.id,
+          body: event.bodyPreview,
+          start: event.start.dateTime.substring(0, 23),
+          end: event.end.dateTime.substring(0, 23),
+          where: event.location.displayName
+        },
+        content_key: "event"
+      });
     } catch (err) {
       return res.render("index", { ...err, content_key: "error" });
     }
   } else {
-    return res.redirect(400,'/get-events');
+    return res.redirect(400, "/get-events");
   }
-})
+});
 router.get("/create-event-page", permissioned(), (req, res) => {
   return res.render("index", {
     content_key: "event",
     user: { token: req.cookies.graph_access_token }
   });
 });
-router.get("/delete-event/:id", permissioned(), async(req, res) =>{
+router.get("/delete-event/:id", permissioned(), async (req, res) => {
   const accessToken = req.cookies.graph_access_token;
   const userName = req.cookies.graph_user_name;
-  const {id} = req.params;
+  const { id } = req.params;
   if (accessToken && id) {
-
     // Initialize Graph client
     const client = graph.Client.init({
       authProvider: done => {
@@ -193,14 +204,14 @@ router.get("/delete-event/:id", permissioned(), async(req, res) =>{
     });
     try {
       let event = await client.api(`/me/events/${id}`).delete();
-      return res.redirect(200, '/get-events')
+      return res.redirect(200, "/get-events");
     } catch (err) {
       return res.render("index", { ...err, content_key: "error" });
     }
   } else {
-    return res.redirect(400,'/get-events');
+    return res.redirect(400, "/get-events");
   }
-})
+});
 router.all("/", (req, res) => {
   if (req.cookies && req.cookies.graph_access_token) {
     return res.render("index", {
