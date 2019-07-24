@@ -1,6 +1,7 @@
 let router = require("express").Router();
 let graph = require("@microsoft/microsoft-graph-client");
 let { permissioned, login, getUser } = require("./helpers");
+let config = require("./config");
 
 router.get("/login", login);
 
@@ -218,5 +219,19 @@ router.all("/", (req, res) => {
   }
   return res.render("index", { user: null });
 });
+if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
+  // webhooks - noops for localhost :P
+  router.post(`${config.notif_path}/:user_id`, (req, res) => {
+    console.log(req, res, "notif_path");
+    if (req.query && req.query.validationToken) {
+      let token = req.query.validationToken;
+      res.setHeader("Content-type", "text/plain");
+      return res.status(200).send(token);
+    } else {
+      console.log("req.body", req.body);
+      res.send(202);
+    }
+  });
+}
 
 module.exports = router;
