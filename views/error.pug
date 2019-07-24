@@ -1,6 +1,8 @@
-div Error occurred in the action
-if code
-    div Error-code: #{code}
-if message
-    div Message: #{message}
-a(href="/") Go to home
+div.error
+    h3 Error occurred in the action
+    a(href="/") Go to home
+    div.info
+        if code
+            h4 Error-code: #{code}
+        if message
+            p Message: #{message}
