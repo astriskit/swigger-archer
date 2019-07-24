@@ -5,7 +5,6 @@ let md5 = require("md5");
 let _stores = null;
 const NOTIFICATION_STORE = "notifs_store";
 const COOKIES_STORE = "cookies_store";
-const COOKIES_NOTIF = "cookies_subscription_id";
 
 function getStore(name) {
   if (!_stores) {
@@ -19,9 +18,30 @@ function getStore(name) {
 
 let notifs = () => getStore(NOTIFICATION_STORE);
 let users = () => getStore(COOKIES_STORE);
-let notifUsers = () => getStore(COOKIES_NOTIF);
 
 let getUser = id => users().get(id, null);
+
+let logout = async (req, res) => {
+  try {
+    const { graph_access_token, subscription_id = undefined } = getUser(
+      req.cookies.uid
+    );
+    if (subscription_id) {
+      const client = graph.Client.init({
+        authProvider: done => {
+          done(null, graph_access_token);
+        }
+      });
+      await client.api("/subscriptions/" + subscription_id).delete();
+      notifs().delete(subscription_id);
+    }
+    users().delete(req.cookies.uid);
+    res.clearCookie("uid");
+    return res.redirect("/");
+  } catch (err) {
+    return res.render("error", { ...err, content_key: "error" });
+  }
+};
 
 const credentials = {
   client: {
@@ -66,7 +86,7 @@ const permissioned = (
     );
   }
 ) => (req, res, next) => {
-  if (checker(req, getStore("cookies_store"))) {
+  if (checker(req, getStore(COOKIES_STORE))) {
     next();
   } else {
     return res.redirect(403, redirectTo);
@@ -95,8 +115,18 @@ const login = async (req, res) => {
         }
       });
       let userStore = users();
+      let sub_id = undefined;
       if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
         // subscriptions noop for the local dev
+        //clear other subscriptions, if any
+        const priorSubscriptions = await client.api("/subscriptions").get();
+        if (priorSubscriptions.length) {
+          await Promise.all(
+            priorSubscriptions.map(({ id }) => {
+              return client.api(`/subscriptions/${id}`).delete();
+            })
+          );
+        }
         const subscription = {
           changeType: "created,updated,deleted",
           notificationUrl: config.notif_uri + "/" + uid,
@@ -107,12 +137,13 @@ const login = async (req, res) => {
         const { id: subscription_id } = await client
           .api(`/subscriptions`)
           .post(subscription);
+        sub_id = subscription_id;
         notifs().set(subscription_id, []);
-        notifUsers().set(subscription_id, uid);
       }
       userStore.set(uid, {
         graph_access_token: token.token.access_token,
-        graph_user_name: user.name
+        graph_user_name: user.name,
+        subscription_id: sub_id
       });
       res.cookie("uid", uid, { maxAge });
       return res.redirect("/");
@@ -136,5 +167,5 @@ module.exports = {
   getUser,
   NOTIFICATION_STORE,
   COOKIES_STORE,
-  COOKIES_NOTIF
+  logout
 };

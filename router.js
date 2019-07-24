@@ -1,14 +1,11 @@
 let router = require("express").Router();
 let graph = require("@microsoft/microsoft-graph-client");
-let { permissioned, login, getUser } = require("./helpers");
+let { permissioned, login, getUser, logout } = require("./helpers");
 let config = require("./config");
 
 router.get("/login", login);
 
-router.get("/logout", permissioned(), (req, res) => {
-  res.clearCookie("uid");
-  return res.redirect("/");
-});
+router.get("/logout", permissioned(), logout);
 
 router.get("/get-events", permissioned(), async (req, res) => {
   let parms = {};
