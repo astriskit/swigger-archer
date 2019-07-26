@@ -224,7 +224,6 @@ router.all("/", (req, res) => {
 if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
   // webhooks - noops for localhost :P
   router.post(`${config.notif_path}/:user_id`, (req, res) => {
-    console.log(req, res, "notif_path");
     if (req.query && req.query.validationToken) {
       let token = req.query.validationToken;
       res.setHeader("Content-type", "text/plain");
