@@ -18,9 +18,7 @@ async function getEventUpdates() {
         POLLING_INTERVAL / 1000 +
         " seconds.";
     }
-    console.info("-----updates------");
     console.table(updates);
-    console.info("-------------------");
   } catch (err) {
     if (err.message === "forbidden") {
       clearInterval(intervalId);
