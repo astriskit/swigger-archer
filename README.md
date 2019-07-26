@@ -13,3 +13,4 @@ https://astriskit-swigger-archer.glitch.me/
 # Roadmap -
 
 1. Notifications regarding change in the events to the user.
+2. Add tests.
