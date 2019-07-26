@@ -19,20 +19,20 @@ function getStore(name) {
 let notifs = () => getStore(NOTIFICATION_STORE);
 let users = () => getStore(COOKIES_STORE);
 
-let setNotifs = (vals=[]) => {
-  vals.forEach(val=>{
-    let pre = notifs().get(val.subscriptionId) || []
-    pre.push(val)
-    notifs().set(val.subscriptionId, pre)
-  })
-}
+let setNotifs = (vals = []) => {
+  vals.forEach(val => {
+    let pre = notifs().get(val.subscriptionId) || [];
+    pre.push(val);
+    notifs().set(val.subscriptionId, pre);
+  });
+};
 
 let getUser = id => users().get(id, null);
 
 let logout = async (req, res) => {
   const { graph_access_token, subscription_id = undefined } = getUser(
-      req.cookies.uid
-    );
+    req.cookies.uid
+  );
   try {
     if (subscription_id) {
       const client = graph.Client.init({
@@ -44,12 +44,12 @@ let logout = async (req, res) => {
       notifs().delete(subscription_id);
     }
   } catch (err) {
-    console.info('unsubscription error')
-    console.error(err)
+    console.info("unsubscription error");
+    console.error(err);
   }
-    users().delete(req.cookies.uid);
+  users().delete(req.cookies.uid);
   res.clearCookie("uid");
-    return res.redirect("/");
+  return res.redirect("/");
 };
 
 const credentials = {
@@ -86,26 +86,25 @@ async function getTokenFromCode(auth_code) {
 
 const isUserLoggedIn = (req, cookie_store) => {
   return (
-      req.cookies &&
-      req.cookies.uid &&
-      cookie_store.get(req.cookies.uid) &&
-      cookie_store.get(req.cookies.uid)["graph_access_token"]
-    );
-}
+    req.cookies &&
+    req.cookies.uid &&
+    cookie_store.get(req.cookies.uid) &&
+    cookie_store.get(req.cookies.uid)["graph_access_token"]
+  );
+};
 
 const permissioned = (
   redirectTo = "/",
   checker = isUserLoggedIn,
-  ifNotPermitted=null
+  ifNotPermitted = null
 ) => (req, res, next) => {
   if (checker(req, getStore(COOKIES_STORE))) {
     next();
   } else {
-    if(ifNotPermitted){
-      return ifNotPermitted(res)
-    }
-    else{
-      return res.redirect(403, redirectTo); 
+    if (ifNotPermitted) {
+      return ifNotPermitted(res);
+    } else {
+      return res.redirect(403, redirectTo);
     }
   }
 };
@@ -136,7 +135,9 @@ const login = async (req, res) => {
       if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
         // subscriptions noop for the local dev
         //clear other subscriptions, if any
-        const {value:priorSubscriptions=[]} = await client.api("/subscriptions").get();
+        const { value: priorSubscriptions = [] } = await client
+          .api("/subscriptions")
+          .get();
         if (priorSubscriptions.length) {
           await Promise.all(
             priorSubscriptions.map(({ id }) => {
@@ -151,9 +152,7 @@ const login = async (req, res) => {
           expirationDateTime: new Date(Date.now() + 24 * 60 * 60).toISOString(),
           clientState: process.env.NOTIF_CLIENT_SECRET
         };
-        const sub = await client
-          .api(`/subscriptions`)
-          .post(subscription);
+        const sub = await client.api(`/subscriptions`).post(subscription);
         sub_id = sub.id;
         notifs().set(sub.id, []);
       }
