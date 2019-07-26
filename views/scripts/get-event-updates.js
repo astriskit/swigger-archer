@@ -4,18 +4,33 @@ async function getEventUpdates() {
   let event_updates = document.getElementById("event-updates");
   try {
     event_updates.innerHTML = "loading updates";
-    let updates = await fetch("/get-event-updates");
+    let res = await fetch("/get-event-updates");
+    if (res.status !== 200) {
+      throw new Error("forbidden");
+    }
+    let updates = await res.json();
     if (updates.length) {
-      event.updates.innerHTML = "<a href=/get-events-page>Refresh</a>";
+      event_updates.innerHTML = "<a href=/get-events>Refresh</a>";
+      clearInterval(intervalId);
+    } else {
+      event_updates.innerHTML =
+        "No updates found. Will check in ~" +
+        POLLING_INTERVAL / 1000 +
+        " seconds.";
     }
     console.info("-----updates------");
-    updates.forEach(update => console.table(update.resource));
+    console.table(updates);
     console.info("-------------------");
   } catch (err) {
-    event_updates.innerHTML = "Error retrieving updates";
-    console.error("Error while retrieving updates");
+    if (err.message === "forbidden") {
+      clearInterval(intervalId);
+      event_updates.innerHTML = "Re-login.";
+    } else {
+      event_updates.innerHTML = "Error retrieving updates";
+      console.error("Error while retrieving updates");
+    }
     console.error(err);
   }
 }
 
-setInterval(getEventUpdates, POLLING_INTERVAL);
+let intervalId = setInterval(getEventUpdates, POLLING_INTERVAL);

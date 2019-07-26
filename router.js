@@ -1,6 +1,14 @@
 let router = require("express").Router();
 let graph = require("@microsoft/microsoft-graph-client");
-let { permissioned, login, getUser, logout, notifs } = require("./helpers");
+let {
+  permissioned,
+  login,
+  getUser,
+  logout,
+  notifs,
+  isUserLoggedIn,
+  setNotifs
+} = require("./helpers");
 let config = require("./config");
 
 router.get("/login", login);
@@ -229,26 +237,30 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
       res.setHeader("Content-type", "text/plain");
       return res.status(200).send(token);
     } else {
-      let { values: userNotifs } = req.body;
-      userNotifs.forEach(notif => {
-        let notif_store = notifs().get(notif.subscription_id);
-        if (notif_store) {
-          notif_store.push(notif);
-        }
-      });
-      return res.send(202);
+      let { value: userNotifs } = req.body;
+      setNotifs(userNotifs);
+      console.info("-----Notifs----");
+      console.info(notifs());
+      console.info("---------------");
+      return res.sendStatus(202);
     }
   });
-  router.get("/get-event-updates", permissioned(), (req, res) => {
-    let { subscription_id } = getUser(req.cookies.uid);
-    if (subscription_id) {
-      let userNotifs = notifs().get(subscription_id);
-      notifs().set(subscription_id, []);
-      return res.json(userNotifs);
-    } else {
-      return res.json([]);
+  router.get(
+    "/get-event-updates",
+    permissioned(null, isUserLoggedIn, res =>
+      res.status(403).json({ error: "FORBIDDEN" })
+    ),
+    (req, res) => {
+      let { subscription_id } = getUser(req.cookies.uid);
+      if (subscription_id) {
+        let userNotifs = notifs().get(subscription_id);
+        notifs().set(subscription_id, []);
+        return res.json(userNotifs);
+      } else {
+        return res.json([]);
+      }
     }
-  });
+  );
 }
 
 module.exports = router;
