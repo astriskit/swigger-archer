@@ -1,6 +1,6 @@
 let router = require("express").Router();
 let graph = require("@microsoft/microsoft-graph-client");
-let { permissioned, login, getUser, logout } = require("./helpers");
+let { permissioned, login, getUser, logout, notifs } = require("./helpers");
 let config = require("./config");
 
 router.get("/login", login);
@@ -172,7 +172,12 @@ router.get("/update-event-page/:id", permissioned(), async (req, res) => {
       content_key: "event"
     });
   } catch (err) {
-    return res.render("index", { ...err, content_key: "error" });
+    return res.render("index", {
+      ...err,
+      content_key: "error",
+      getEventUpdates:
+        process.env.NODE_ENV && process.env.NODE_ENV === "production"
+    });
   }
 });
 
@@ -225,8 +230,24 @@ if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
       res.setHeader("Content-type", "text/plain");
       return res.status(200).send(token);
     } else {
-      console.log("req.body", req.body);
-      res.send(202);
+      let { values: userNotifs } = req.body;
+      userNotifs.forEach(notif => {
+        let notif_store = notifs().get(notif.subscription_id);
+        if (notif_store) {
+          notif_store.push(notif);
+        }
+      });
+      return res.send(202);
+    }
+  });
+  router.get("/get-event-updates", permissioned(), (req, res) => {
+    let { subscription_id } = getUser(req.cookies.uid);
+    if (subscription_id) {
+      let userNotifs = notifs().get(subscription_id);
+      notifs().set(subscription_id, []);
+      return res.json(userNotifs);
+    } else {
+      return res.json([]);
     }
   });
 }
