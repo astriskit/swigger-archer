@@ -42,7 +42,9 @@ router.get("/get-events", permissioned(), async (req, res) => {
     res.render("index", {
       ...parms,
       user: { token: accessToken },
-      content_key: "events"
+      content_key: "events",
+      getEventUpdates:
+        process.env.NODE_ENV && process.env.NODE_ENV === "production"
     });
   } catch (err) {
     parms.message = "Error retrieving events";
@@ -174,9 +176,7 @@ router.get("/update-event-page/:id", permissioned(), async (req, res) => {
   } catch (err) {
     return res.render("index", {
       ...err,
-      content_key: "error",
-      getEventUpdates:
-        process.env.NODE_ENV && process.env.NODE_ENV === "production"
+      content_key: "error"
     });
   }
 });
