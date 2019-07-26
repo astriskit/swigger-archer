@@ -4,7 +4,9 @@
   "description": "a web app for managing one's outlook.com events",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "export NODE_ENV=production; node app.js",
+    "http-dev": "export NODE_ENV=development; node app.js",
+    "https-dev": "export NODE_ENV=development; export _SECURE_HTTP=1; node app.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +22,7 @@
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "md5": "^2.2.1",
     "pug": "^2.0.4",
     "simple-oauth2": "^2.2.1"
   }

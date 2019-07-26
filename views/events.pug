@@ -12,3 +12,8 @@ div.events-list-container
                 a.danger(href='/delete-event/'+event.id) Delete
         else
             li No events for this weekend
+if getEventUpdates
+    h3 Updates
+    p#event-updates No updates till now.
+    script
+        include ./scripts/get-event-updates.js
