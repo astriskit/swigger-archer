@@ -9,8 +9,9 @@ https://astriskit-swigger-archer.glitch.me/
 # Features -
 
 1. Basic CRUD operation of /me/calendar/events
+2. Alerts user if any of the events change
 
 # Roadmap -
 
-1. Notifications regarding change in the events to the user.
+1. Notifications regarding change in the events to the user (testing).
 2. Add tests.
